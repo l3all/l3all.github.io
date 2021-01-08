@@ -1,0 +1,11 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Apple Inc.//Mac OS X 10.15.7//EN
+N:Chartier;Nicolas;;;
+FN:Nicolas Chartier
+ORG:wrk3;
+EMAIL;type=INTERNET;type=HOME;type=pref:ndchartier@gmail.com
+TEL;type=IPHONE;type=CELL;type=VOICE;type=pref:5146068011
+item1.URL;type=pref:l3all.github.io
+item1.X-ABLabel:_$!<HomePage>!$_
+END:VCARD
