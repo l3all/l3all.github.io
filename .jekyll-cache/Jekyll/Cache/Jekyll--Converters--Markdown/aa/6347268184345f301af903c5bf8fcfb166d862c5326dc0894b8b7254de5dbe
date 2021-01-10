@@ -1,0 +1,18 @@
+I"A<p>I just wanted to document the creation process of creating this website. The goal of this site is to share what I do with you. I will be promoting my woodworking projects and everything I deem showable of the free time stuff going on here.</p>
+
+<p>So I needed a simple vessel to present that. Here we are with the technicals:</p>
+
+<h4 id="installing-ruby-on-a-mac-used-chruby-and-ruby-install">Installing Ruby on a Mac. used chruby and ruby-install</h4>
+<p><a href="https://thoughtbot.com/blog/psa-do-not-use-system-ruby">thoughbot.com</a></p>
+
+<ul>
+  <li>Installing Bundler as per jeryll website procedure</li>
+  <li>Installing Jekyll (text to static website) <a href="https://jekyllrb.com">LINK</a></li>
+  <li>Jekyll theme Clean Blog</li>
+  <li>Using atom as my IDE <a href="https://atom.io">LINK</a></li>
+  <li>Integrating git as my version control for the project</li>
+  <li>Using github.io to host the website with a custom domain name</li>
+  <li>Modifying the cname of my domain name to point to github servers</li>
+  <li>Creating this page to document the whole thing</li>
+</ul>
+:ET

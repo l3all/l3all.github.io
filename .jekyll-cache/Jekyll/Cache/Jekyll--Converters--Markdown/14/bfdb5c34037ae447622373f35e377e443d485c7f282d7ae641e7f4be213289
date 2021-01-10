@@ -1,0 +1,35 @@
+I"�<p>I just wanted to document the creation process of creating this website. The goal of this site is to share what I do with you. I will be promoting my woodworking projects and everything I deem showable of the free time stuff going on here.</p>
+
+<p>So I needed a simple vessel to present that. Here we are with the technicals:</p>
+
+<h4 id="installing-brew">Installing brew</h4>
+<p>Brew is a package manager for macOS. It is immensly useful to install things and keep them up to date. <a href="https://brew.sh">brew.sh</a></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>xcode-select --install
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+</code></pre></div></div>
+
+<p>Enter your macOS password
+The installation should perform without any errors.</p>
+
+<h4 id="installing-ruby">Installing ruby</h4>
+<p>macOS uses an old version of ruby by default and it’s increasingly hard to update it with the latest updates because you encounter permission errors so the best way to go around this problem is installing a virtual environment to then install a version of ruby inside like rbenv or RVM or you can install a ruby changer for the whole system like chruby.
+In my case I chose chruby and its friend ruby-install. Ruby-install will install from source any version of ruby so chruby can select the one to use system wide.</p>
+
+<h5 id="in-the-terminal">In the terminal…</h5>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>brew install churby ruby-install -y
+chruby -V   #To see if it's installed properly
+ruby-install ruby 2.7.2   #Will install ruby 2.7.2 from source
+</code></pre></div></div>
+
+<ul>
+  <li>Installing Bundler as per jeryll website procedure</li>
+  <li>Installing Jekyll (text to static website) <a href="https://jekyllrb.com">LINK</a></li>
+  <li>Jekyll theme Clean Blog</li>
+  <li>Using atom as my IDE <a href="https://atom.io">LINK</a></li>
+  <li>Integrating git as my version control for the project</li>
+  <li>Using github.io to host the website with a custom domain name</li>
+  <li>Modifying the cname of my domain name to point to github servers</li>
+  <li>Creating this page to document the whole thing</li>
+</ul>
+:ET
