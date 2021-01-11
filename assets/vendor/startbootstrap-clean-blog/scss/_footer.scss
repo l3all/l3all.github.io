@@ -10,4 +10,11 @@ footer {
     margin-bottom: 0;
     text-align: center;
   }
+  .form-control {
+    width: auto;
+    display:inline;
+  }
+  .form-group {
+    display:table-cell;
+  }
 }
