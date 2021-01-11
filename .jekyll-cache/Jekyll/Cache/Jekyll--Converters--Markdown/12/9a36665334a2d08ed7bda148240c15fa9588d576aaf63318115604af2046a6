@@ -1,0 +1,46 @@
+I"«	<p>I need to better keep track of my investments while not having to constantly check them everyday. There is plenty of subscriptions services that does that but I wanted to learn some python so here is the perfect excuse try to build one.</p>
+
+<h5 id="here-is-my-inspiration-source">Here is my inspiration Source:</h5>
+
+<ul>
+  <li><a href="https://medium.com/illumination/how-to-build-a-stock-price-alert-using-python-d7d61ec12f2">How to Build a Stock Price Alert Using Python</a></li>
+  <li><a href="https://medium.com/quantjam/how-to-create-stock-alert-system-using-python-and-windows-task-scheduler-5e909c24af27">How to Create Stock Alert System using Python and Windows Task Scheduler</a></li>
+  <li><a href="https://gist.github.com/Moving-Electrons/8387168">StockPriceCheck.py from Moving-Electrons on Github</a></li>
+  <li><a href="https://github.com/laprice/pushover">Python Pushover from laprice on Github</a></li>
+</ul>
+
+<p><br /></p>
+<h4 id="my-code">My code:</h4>
+
+<pre><code class="language-Python">import pandas as pd #Data manipulation and analysis package
+from alpha_vantage.timeseries import TimeSeries #Enables data pull from Alpha Vantage
+import matplotlib.pyplot as plt #If you want to plot your findings
+import time
+from pushover import Client #Enables you to push notifications to your phone
+
+symbol = "AAPL"
+target_sell_price = 230 #enter the price you want to sell at
+target_buy_price = 128 #enter the price you want to buy at
+
+#Getting the data from alpha_vantage
+ts = TimeSeries(key='#####KEY#####', output_format='pandas')
+data, meta_data = ts.get_intraday(symbol,interval='5min', outputsize='full')
+
+#We are currently interested in the latest price
+close_data = data['4. close'] #The close data column
+last_price = close_data[0] #Selecting the last price from the close_data column
+
+client = Client("#####CLIENT_TOKEN#####", api_token="#####API_TOKEN#####")#auth with pushover
+
+
+
+if last_price &gt; target_sell_price:
+    message = str(symbol) + " STOCK ALERT!!! The stock is now above $" + format(target_sell_price, '.2f') + " it's at $" + format(last_price, '.2f')#The message you want to send
+    client.send_message(message, title="Stock Price Alert")
+
+if last_price &lt;= target_buy_price:
+    message = str(symbol) + " STOCK ALERT!!! The stock is now under $" + format(target_buy_price, '.2f') + " it's at $" + format(last_price, '.2f')#The message you want to send
+    client.send_message(message, title="Stock Price Alert")
+
+</code></pre>
+:ET

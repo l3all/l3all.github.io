@@ -1,0 +1,111 @@
+I"0<p>I needed to better keep track of my investments while not having to constantly check them everyday. There is plenty of subscriptions services that does that but I wanted to learn some python so here is the perfect excuse to try to build one. A Raspberry pi is a good option for that service since it will always run on my server.</p>
+
+<h5 id="here-is-my-inspiration-source">Here is my inspiration Source:</h5>
+
+<ul>
+  <li><a href="https://medium.com/illumination/how-to-build-a-stock-price-alert-using-python-d7d61ec12f2">How to Build a Stock Price Alert Using Python</a></li>
+  <li><a href="https://medium.com/quantjam/how-to-create-stock-alert-system-using-python-and-windows-task-scheduler-5e909c24af27">How to Create Stock Alert System using Python and Windows Task Scheduler</a></li>
+  <li><a href="https://gist.github.com/Moving-Electrons/8387168">StockPriceCheck.py from Moving-Electrons on Github</a></li>
+  <li><a href="https://github.com/laprice/pushover">Python Pushover from laprice on Github</a></li>
+</ul>
+
+<p><br /></p>
+<h4 id="setting-up-the-prerequisites">Setting up the prerequisites</h4>
+<p>You need an Alpha Vantage account at <a href="https://www.alphavantage.co">alphavantage.co</a> and generate an api key or #####AV_API_KEY#####, it’s free. Also you need to install Pushover on your device (iPhone / android / Desktop) at <a href="https://pushover.net">pushover.net</a>. On their website you will need to note your User key or #####PUSHOVER_CLIENT_TOKEN##### and create an application to generate an api key or #####PUSHOVER_API_TOKEN#####. The Pushover app has a trial and is not expensive considering it’s usefulness.</p>
+
+<h5 id="other-prerequisites">Other prerequisites:</h5>
+<ul>
+  <li>Python 3 (Python 3 is preinstalled on the pi4)</li>
+  <li>virtualenv</li>
+  <li><a href="https://github.com/pandas-dev/pandas">Github project pandas</a></li>
+  <li><a href="https://github.com/RomelTorres/alpha_vantage">Github project alpha_vantage</a></li>
+  <li><a href="https://github.com/matplotlib/matplotlib">Github project matplotlib</a></li>
+  <li><a href="https://github.com/Thibauth/python-pushover">Github project python-pushover</a></li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd ~/Dev/
+virtualenv -p python3 StockPriceAlert
+cd StockPriceAlert
+python -V
+  &gt;Python 3.9.1   #This is the system version of python
+sudo apt-get update   #This updates all the apps on the Raspberry Pi
+sudo apt-get install libopenjp2-7-dev   #Missing libraries on Raspberry Pi
+sudo apt-get install libtiff5-dev   #Missing libraries on Raspberry Pi
+source bin/activate
+python -V
+  &gt;Python 3.9.1   #In my case I my virtualenv uses the same version a the system one. It could easily be different.
+pip freeze
+  &gt;
+pip install pandas
+pip install alpha_vantage   #Github project alpha_vantage
+pip install matplotlib
+pip install python-pushover   #Github project python-pushover
+pip freeze
+  &gt;aiohttp==3.7.3
+  &gt;alpha-vantage==2.3.1
+  &gt;async-timeout==3.0.1
+  &gt;attrs==20.3.0
+  &gt;certifi==2020.12.5
+  &gt;chardet==3.0.4
+  &gt;cycler==0.10.0
+  &gt;idna==2.10
+  &gt;kiwisolver==1.3.1
+  &gt;matplotlib==3.3.3
+  &gt;multidict==5.1.0
+  &gt;numpy==1.19.5
+  &gt;pandas==1.2.0
+  &gt;Pillow==8.1.0
+  &gt;pyparsing==2.4.7
+  &gt;python-dateutil==2.8.1
+  &gt;python-pushover==0.4
+  &gt;pytz==2020.5
+  &gt;requests==2.25.1
+  &gt;six==1.15.0
+  &gt;typing-extensions==3.7.4.3
+  &gt;urllib3==1.26.2
+  &gt;yarl==1.6.3
+touch app.py  #Creates the file app.py where your script resides.
+nano app.py   #Edit the content of app.py.
+python app.py   #Run the script.
+deactivate  #Exit the virtualenv
+</code></pre></div></div>
+
+<p><br /></p>
+<h4 id="the-contents-of-apppy">The contents of app.py:</h4>
+
+<pre><code class="language-Python">import pandas as pd #Data manipulation and analysis package
+from alpha_vantage.timeseries import TimeSeries #Enables data pull from Alpha Vantage
+import matplotlib.pyplot as plt #If you want to plot your findings
+import time
+from pushover import Client #Enables you to push notifications to your phone
+
+symbol = "AAPL"
+target_sell_price = 230 #enter the price you want to sell at
+target_buy_price = 128 #enter the price you want to buy at
+interval = '5min' #enter the interval between getting the data from Alpha Vantage
+
+#Getting the data from alpha_vantage
+ts = TimeSeries(key='#####AV_API_KEY#####', output_format='pandas')
+data, meta_data = ts.get_intraday(symbol,interval, outputsize='full')
+
+#We are currently interested in the latest price
+close_data = data['4. close'] #The close data column
+last_price = close_data[0] #Selecting the last price from the close_data column
+
+client = Client("#####PUSHOVER_CLIENT_TOKEN#####", api_token="#####PUSHOVER_API_TOKEN#####")#auth with pushover
+
+if last_price &gt; target_sell_price:
+    message = str(symbol) + " STOCK ALERT!!! The stock is now above $" + format(target_sell_price, '.2f') + " it's at $" + format(last_price, '.2f')#The message you want to send
+    client.send_message(message, title="Stock Price Alert")
+
+if last_price &lt;= target_buy_price:
+    message = str(symbol) + " STOCK ALERT!!! The stock is now under $" + format(target_buy_price, '.2f') + " it's at $" + format(last_price, '.2f')#The message you want to send
+    client.send_message(message, title="Stock Price Alert")
+
+</code></pre>
+
+<p><br /></p>
+<h4 id="its-now-time-to-refine-the-working-base-script">It’s now time to refine the working base script</h4>
+<p>I need the code to take into account multiple stocks with custom target_buy_price and target_sell_price for each. It could be on a spreadsheet or directly in the script code.
+The script should run on <a href="https://raspberrypi.stackexchange.com/questions/36927/activate-virtualenv-start-script-on-boot-rpi">boot</a> in case the server <a href="https://domoticproject.com/protect-raspberry-pi-ups-power-failure/">runs out of power</a>.</p>
+:ET

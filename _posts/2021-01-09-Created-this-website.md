@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Creation process to this website"
-subtitle: "Because I can!"
+title: "Why this website?"
+subtitle: "Creation process to this website (technical)"
 background: '/img/posts/Creation-process/clement-helardot-95YRwf6CNw8-unsplash.jpg'
 ---
 

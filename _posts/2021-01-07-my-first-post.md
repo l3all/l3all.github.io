@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "My first post"
-subtitle: "Hello world! with Markdown"
+title: "First post"
+subtitle: "Hello world! with Markdown. Let's start the engine!"
 background: '/img/posts/Hello-world/earth-atmosphere-from-space_1024.jpg'
 ---
 

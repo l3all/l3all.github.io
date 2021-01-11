@@ -1,0 +1,111 @@
+I"s+<p>I needed to keep track of my investments while not having to constantly check them everyday. There is plenty of subscription services that does that but I wanted to learn some python so I got the perfect excuse to try and build one. I will start with a Raspberry pi as the base to serve that service since it will always be running on my network.</p>
+
+<p>In this series I will start from the beginnings to a working notification system. I also expect the functionality to evolve trough the process.</p>
+
+<h5 id="here-is-my-inspiration-source">Here is my inspiration Source:</h5>
+
+<ul>
+  <li><a href="https://medium.com/illumination/how-to-build-a-stock-price-alert-using-python-d7d61ec12f2">How to Build a Stock Price Alert Using Python</a></li>
+  <li><a href="https://medium.com/quantjam/how-to-create-stock-alert-system-using-python-and-windows-task-scheduler-5e909c24af27">How to Create Stock Alert System using Python and Windows Task Scheduler</a></li>
+  <li><a href="https://gist.github.com/Moving-Electrons/8387168">StockPriceCheck.py from Moving-Electrons on Github</a></li>
+  <li><a href="https://github.com/laprice/pushover">Python Pushover from laprice on Github</a></li>
+</ul>
+
+<p><br /></p>
+<h4 id="setting-up-the-prerequisites">Setting up the prerequisites</h4>
+<p>You need an Alpha Vantage account at <a href="https://www.alphavantage.co">alphavantage.co</a> and generate an api key or #####AV_API_KEY#####, it’s free. Also you need to install Pushover on your device (iPhone / android / Desktop) at <a href="https://pushover.net">pushover.net</a>. On their website you will need to note your User key or #####PUSHOVER_CLIENT_TOKEN##### and create an application to generate an api key or #####PUSHOVER_API_TOKEN#####. The Pushover app has a trial and is not expensive considering it’s usefulness.</p>
+
+<h5 id="other-prerequisites">Other prerequisites:</h5>
+<ul>
+  <li>Python 3 (Python 3 is preinstalled on the pi4)</li>
+  <li>virtualenv</li>
+  <li><a href="https://github.com/pandas-dev/pandas">Github project pandas</a></li>
+  <li><a href="https://github.com/RomelTorres/alpha_vantage">Github project alpha_vantage</a></li>
+  <li><a href="https://github.com/matplotlib/matplotlib">Github project matplotlib</a></li>
+  <li><a href="https://github.com/Thibauth/python-pushover">Github project python-pushover</a></li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cd</span> <span class="o">~/</span><span class="n">Dev</span><span class="o">/</span>
+<span class="n">virtualenv</span> <span class="o">-</span><span class="n">p</span> <span class="n">python3</span> <span class="n">StockPriceAlert</span>
+<span class="n">cd</span> <span class="n">StockPriceAlert</span>
+<span class="n">python</span> <span class="o">-</span><span class="n">V</span>
+  <span class="o">&gt;</span><span class="n">Python</span> <span class="mf">3.9</span><span class="p">.</span><span class="mi">1</span>   <span class="c1">#This is the system version of python
+</span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span>   <span class="c1">#This updates all the apps on the Raspberry Pi
+</span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">libopenjp2</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="n">dev</span>   <span class="c1">#Missing libraries on Raspberry Pi
+</span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">libtiff5</span><span class="o">-</span><span class="n">dev</span>   <span class="c1">#Missing libraries on Raspberry Pi
+</span><span class="n">source</span> <span class="nb">bin</span><span class="o">/</span><span class="n">activate</span>
+<span class="n">python</span> <span class="o">-</span><span class="n">V</span>
+  <span class="o">&gt;</span><span class="n">Python</span> <span class="mf">3.9</span><span class="p">.</span><span class="mi">1</span>   <span class="c1">#In my case I my virtualenv uses the same version a the system one. It could easily be different.
+</span><span class="n">pip</span> <span class="n">freeze</span>
+  <span class="o">&gt;</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">pandas</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">alpha_vantage</span>   <span class="c1">#Github project alpha_vantage
+</span><span class="n">pip</span> <span class="n">install</span> <span class="n">matplotlib</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">python</span><span class="o">-</span><span class="n">pushover</span>   <span class="c1">#Github project python-pushover
+</span><span class="n">pip</span> <span class="n">freeze</span>
+  <span class="o">&gt;</span><span class="n">aiohttp</span><span class="o">==</span><span class="mf">3.7</span><span class="p">.</span><span class="mi">3</span>
+  <span class="o">&gt;</span><span class="n">alpha</span><span class="o">-</span><span class="n">vantage</span><span class="o">==</span><span class="mf">2.3</span><span class="p">.</span><span class="mi">1</span>
+  <span class="o">&gt;</span><span class="k">async</span><span class="o">-</span><span class="n">timeout</span><span class="o">==</span><span class="mf">3.0</span><span class="p">.</span><span class="mi">1</span>
+  <span class="o">&gt;</span><span class="n">attrs</span><span class="o">==</span><span class="mf">20.3</span><span class="p">.</span><span class="mi">0</span>
+  <span class="o">&gt;</span><span class="n">certifi</span><span class="o">==</span><span class="mf">2020.12</span><span class="p">.</span><span class="mi">5</span>
+  <span class="o">&gt;</span><span class="n">chardet</span><span class="o">==</span><span class="mf">3.0</span><span class="p">.</span><span class="mi">4</span>
+  <span class="o">&gt;</span><span class="n">cycler</span><span class="o">==</span><span class="mf">0.10</span><span class="p">.</span><span class="mi">0</span>
+  <span class="o">&gt;</span><span class="n">idna</span><span class="o">==</span><span class="mf">2.10</span>
+  <span class="o">&gt;</span><span class="n">kiwisolver</span><span class="o">==</span><span class="mf">1.3</span><span class="p">.</span><span class="mi">1</span>
+  <span class="o">&gt;</span><span class="n">matplotlib</span><span class="o">==</span><span class="mf">3.3</span><span class="p">.</span><span class="mi">3</span>
+  <span class="o">&gt;</span><span class="n">multidict</span><span class="o">==</span><span class="mf">5.1</span><span class="p">.</span><span class="mi">0</span>
+  <span class="o">&gt;</span><span class="n">numpy</span><span class="o">==</span><span class="mf">1.19</span><span class="p">.</span><span class="mi">5</span>
+  <span class="o">&gt;</span><span class="n">pandas</span><span class="o">==</span><span class="mf">1.2</span><span class="p">.</span><span class="mi">0</span>
+  <span class="o">&gt;</span><span class="n">Pillow</span><span class="o">==</span><span class="mf">8.1</span><span class="p">.</span><span class="mi">0</span>
+  <span class="o">&gt;</span><span class="n">pyparsing</span><span class="o">==</span><span class="mf">2.4</span><span class="p">.</span><span class="mi">7</span>
+  <span class="o">&gt;</span><span class="n">python</span><span class="o">-</span><span class="n">dateutil</span><span class="o">==</span><span class="mf">2.8</span><span class="p">.</span><span class="mi">1</span>
+  <span class="o">&gt;</span><span class="n">python</span><span class="o">-</span><span class="n">pushover</span><span class="o">==</span><span class="mf">0.4</span>
+  <span class="o">&gt;</span><span class="n">pytz</span><span class="o">==</span><span class="mf">2020.5</span>
+  <span class="o">&gt;</span><span class="n">requests</span><span class="o">==</span><span class="mf">2.25</span><span class="p">.</span><span class="mi">1</span>
+  <span class="o">&gt;</span><span class="n">six</span><span class="o">==</span><span class="mf">1.15</span><span class="p">.</span><span class="mi">0</span>
+  <span class="o">&gt;</span><span class="n">typing</span><span class="o">-</span><span class="n">extensions</span><span class="o">==</span><span class="mf">3.7</span><span class="p">.</span><span class="mf">4.3</span>
+  <span class="o">&gt;</span><span class="n">urllib3</span><span class="o">==</span><span class="mf">1.26</span><span class="p">.</span><span class="mi">2</span>
+  <span class="o">&gt;</span><span class="n">yarl</span><span class="o">==</span><span class="mf">1.6</span><span class="p">.</span><span class="mi">3</span>
+<span class="n">touch</span> <span class="n">app</span><span class="p">.</span><span class="n">py</span>  <span class="c1">#Creates the file app.py where your script resides.
+</span><span class="n">nano</span> <span class="n">app</span><span class="p">.</span><span class="n">py</span>   <span class="c1">#Edit the content of app.py.
+</span><span class="n">python</span> <span class="n">app</span><span class="p">.</span><span class="n">py</span>   <span class="c1">#Run the script.
+</span><span class="n">deactivate</span>  <span class="c1">#Exit the virtualenv
+</span></code></pre></div></div>
+
+<p><br /></p>
+<h4 id="the-contents-of-apppy">The contents of app.py:</h4>
+
+<pre><code class="language-Python">import pandas as pd #Data manipulation and analysis package
+from alpha_vantage.timeseries import TimeSeries #Enables data pull from Alpha Vantage
+import matplotlib.pyplot as plt #If you want to plot your findings
+import time
+from pushover import Client #Enables you to push notifications to your phone
+
+symbol = "AAPL"
+target_sell_price = 230 #enter the price you want to sell at
+target_buy_price = 128 #enter the price you want to buy at
+interval = '5min' #enter the interval between getting the data from Alpha Vantage
+
+#Getting the data from alpha_vantage
+ts = TimeSeries(key='#####AV_API_KEY#####', output_format='pandas')
+data, meta_data = ts.get_intraday(symbol,interval, outputsize='full')
+
+#We are currently interested in the latest price
+close_data = data['4. close'] #The close data column
+last_price = close_data[0] #Selecting the last price from the close_data column
+
+client = Client("#####PUSHOVER_CLIENT_TOKEN#####", api_token="#####PUSHOVER_API_TOKEN#####")#auth with pushover
+
+if last_price &gt; target_sell_price:
+    message = str(symbol) + " STOCK ALERT!!! The stock is now above $" + format(target_sell_price, '.2f') + " it's at $" + format(last_price, '.2f')#The message you want to send
+    client.send_message(message, title="Stock Price Alert")
+
+if last_price &lt;= target_buy_price:
+    message = str(symbol) + " STOCK ALERT!!! The stock is now under $" + format(target_buy_price, '.2f') + " it's at $" + format(last_price, '.2f')#The message you want to send
+    client.send_message(message, title="Stock Price Alert")
+
+</code></pre>
+
+<p><br />
+To be continued…</p>
+:ET
