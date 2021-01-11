@@ -2,6 +2,7 @@
 layout: post
 title: "Stock Prices Alerts <br>(part 1)"
 subtitle: "A python script that pushes notifications to an iPhone"
+date: 2021-01-10 09:00:00 -0500
 background: '/img/posts/Python-Stock-Price-Alert/lo-lo-CeVj8lPBJSc-unsplash.jpg'
 ---
 
