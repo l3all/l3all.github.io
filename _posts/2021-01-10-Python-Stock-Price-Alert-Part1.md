@@ -87,7 +87,7 @@ deactivate  #Exit the virtualenv
 <br/>
 #### The contents of app.py:
 
-```Python
+```python
 import pandas as pd #Data manipulation and analysis package
 from alpha_vantage.timeseries import TimeSeries #Enables data pull from Alpha Vantage
 import matplotlib.pyplot as plt #If you want to plot your findings

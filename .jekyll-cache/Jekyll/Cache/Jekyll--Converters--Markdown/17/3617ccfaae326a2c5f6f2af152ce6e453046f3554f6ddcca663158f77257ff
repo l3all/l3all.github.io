@@ -1,4 +1,4 @@
-I"‹ <p>I needed to keep track of my investments while not having to constantly check them everyday. There is plenty of subscription services that does that but I wanted to learn some python so I got the perfect excuse to try and build one. I will start with a Raspberry pi as the base to serve that service since it will always be running on my network.</p>
+I"n0<p>I needed to keep track of my investments while not having to constantly check them everyday. There is plenty of subscription services that does that but I wanted to learn some python so I got the perfect excuse to try and build one. I will start with a Raspberry pi as the base to serve that service since it will always be running on my network.</p>
 
 <p>In this series I will start from the beginnings to a working notification system. I also expect the functionality to evolve trough the process.</p>
 
@@ -81,36 +81,36 @@ deactivate  <span class="c">#Exit the virtualenv</span>
 <p><br /></p>
 <h4 id="the-contents-of-apppy">The contents of app.py:</h4>
 
-<pre><code class="language-Python">import pandas as pd #Data manipulation and analysis package
-from alpha_vantage.timeseries import TimeSeries #Enables data pull from Alpha Vantage
-import matplotlib.pyplot as plt #If you want to plot your findings
-import time
-from pushover import Client #Enables you to push notifications to your phone
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span> <span class="c1">#Data manipulation and analysis package
+</span><span class="kn">from</span> <span class="nn">alpha_vantage.timeseries</span> <span class="kn">import</span> <span class="n">TimeSeries</span> <span class="c1">#Enables data pull from Alpha Vantage
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span> <span class="c1">#If you want to plot your findings
+</span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">pushover</span> <span class="kn">import</span> <span class="n">Client</span> <span class="c1">#Enables you to push notifications to your phone
+</span>
+<span class="n">symbol</span> <span class="o">=</span> <span class="s">"AAPL"</span>
+<span class="n">target_sell_price</span> <span class="o">=</span> <span class="mi">230</span> <span class="c1">#enter the price you want to sell at
+</span><span class="n">target_buy_price</span> <span class="o">=</span> <span class="mi">128</span> <span class="c1">#enter the price you want to buy at
+</span><span class="n">interval</span> <span class="o">=</span> <span class="s">'5min'</span> <span class="c1">#enter the interval between getting the data from Alpha Vantage
+</span>
+<span class="c1">#Getting the data from alpha_vantage
+</span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSeries</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s">'#####AV_API_KEY#####'</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s">'pandas'</span><span class="p">)</span>
+<span class="n">data</span><span class="p">,</span> <span class="n">meta_data</span> <span class="o">=</span> <span class="n">ts</span><span class="p">.</span><span class="n">get_intraday</span><span class="p">(</span><span class="n">symbol</span><span class="p">,</span><span class="n">interval</span><span class="p">,</span> <span class="n">outputsize</span><span class="o">=</span><span class="s">'full'</span><span class="p">)</span>
 
-symbol = "AAPL"
-target_sell_price = 230 #enter the price you want to sell at
-target_buy_price = 128 #enter the price you want to buy at
-interval = '5min' #enter the interval between getting the data from Alpha Vantage
+<span class="c1">#We are currently interested in the latest price
+</span><span class="n">close_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">'4. close'</span><span class="p">]</span> <span class="c1">#The close data column
+</span><span class="n">last_price</span> <span class="o">=</span> <span class="n">close_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#Selecting the last price from the close_data column
+</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">(</span><span class="s">"#####PUSHOVER_CLIENT_TOKEN#####"</span><span class="p">,</span> <span class="n">api_token</span><span class="o">=</span><span class="s">"#####PUSHOVER_API_TOKEN#####"</span><span class="p">)</span><span class="c1">#auth with pushover
+</span>
+<span class="k">if</span> <span class="n">last_price</span> <span class="o">&gt;</span> <span class="n">target_sell_price</span><span class="p">:</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span> <span class="o">+</span> <span class="s">" STOCK ALERT!!! The stock is now above $"</span> <span class="o">+</span> <span class="nb">format</span><span class="p">(</span><span class="n">target_sell_price</span><span class="p">,</span> <span class="s">'.2f'</span><span class="p">)</span> <span class="o">+</span> <span class="s">" it's at $"</span> <span class="o">+</span> <span class="nb">format</span><span class="p">(</span><span class="n">last_price</span><span class="p">,</span> <span class="s">'.2f'</span><span class="p">)</span><span class="c1">#The message you want to send
+</span>    <span class="n">client</span><span class="p">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">"Stock Price Alert"</span><span class="p">)</span>
 
-#Getting the data from alpha_vantage
-ts = TimeSeries(key='#####AV_API_KEY#####', output_format='pandas')
-data, meta_data = ts.get_intraday(symbol,interval, outputsize='full')
+<span class="k">if</span> <span class="n">last_price</span> <span class="o">&lt;=</span> <span class="n">target_buy_price</span><span class="p">:</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span> <span class="o">+</span> <span class="s">" STOCK ALERT!!! The stock is now under $"</span> <span class="o">+</span> <span class="nb">format</span><span class="p">(</span><span class="n">target_buy_price</span><span class="p">,</span> <span class="s">'.2f'</span><span class="p">)</span> <span class="o">+</span> <span class="s">" it's at $"</span> <span class="o">+</span> <span class="nb">format</span><span class="p">(</span><span class="n">last_price</span><span class="p">,</span> <span class="s">'.2f'</span><span class="p">)</span><span class="c1">#The message you want to send
+</span>    <span class="n">client</span><span class="p">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">"Stock Price Alert"</span><span class="p">)</span>
 
-#We are currently interested in the latest price
-close_data = data['4. close'] #The close data column
-last_price = close_data[0] #Selecting the last price from the close_data column
-
-client = Client("#####PUSHOVER_CLIENT_TOKEN#####", api_token="#####PUSHOVER_API_TOKEN#####")#auth with pushover
-
-if last_price &gt; target_sell_price:
-    message = str(symbol) + " STOCK ALERT!!! The stock is now above $" + format(target_sell_price, '.2f') + " it's at $" + format(last_price, '.2f')#The message you want to send
-    client.send_message(message, title="Stock Price Alert")
-
-if last_price &lt;= target_buy_price:
-    message = str(symbol) + " STOCK ALERT!!! The stock is now under $" + format(target_buy_price, '.2f') + " it's at $" + format(last_price, '.2f')#The message you want to send
-    client.send_message(message, title="Stock Price Alert")
-
-</code></pre>
+</code></pre></div></div>
 
 <p><br />
 To be continuedâ€¦</p>
